@@ -59,34 +59,33 @@ const sensors = {
     },
 
 }
-function calcPlannedActs(){
-    let acts = {};
-    for (let sensorId in sensors){
-        let sensor = sensors[sensorId];
-        for (let actIdx in sensor.acts){
-            let act = sensor.acts[actIdx];
-            let dateStart = new Date(act.date_start);
+function calcPlannedActs() {
+    let acts = {}; // Создаем объект acts для хранения результатов
+    for (let sensorId in sensors) { // Перебираем все сенсоры в объекте sensors
+        let sensor = sensors[sensorId]; // Получаем конкретный сенсор по ID
+        for (let actIdx in sensor.act) { // actIdx это индекс массива
+            let act = sensor.act[actIdx]; // Получаем конкретный акт по индексу
+            let dateStart = new Date(act.date_start); // Получаем конкретный акт по индексу
             let period = act.period_action;
 
-            console.log("Дата начала:", dateStart);
+            console.log("Дата начала:", dateStart.toLocaleDateString());
 
-
-            let plannedActs = []; // Массив для хранения запланированных актов
-            for (let i = 0; i < 4; i++) { // создал цикл for добавил в массив даты
-                let newDate = new Date(dateStart);
-                newDate.setDate(dateStart.getDate() + i * 1); // прибавляю 1 месяц на каждом шаге
-                plannedActs.push(newDate); // использует метод push() для добавления элемента newDate в массив plannedActs
+            let plannedActs = []; // Массив для хранения запланированных дат
+            for (let i = 0; i < 4; i++) { // Генерируем 4 плановых даты, начиная с даты начала
+                let newDate = new Date(dateStart); // Создаем копию даты начала, чтобы не менять исходную
+                newDate.setMonth(newDate.getMonth() + i);  // Добавляем i месяцев к исходной дате
+                plannedActs.push(newDate); // Добавляем полученную дату в массив
             }
 
-            // Вывод дат
-            plannedActs.forEach(date => {
-                console.log("Запланированная дата:", date.toLocaleDateString()); // toLocaleDateString метод для преобразования объекта "Date" в строку вывод даты
+            // Вывод запланированных дат
+            plannedActs.forEach(date => { // Перебираем массив запланированных дат и выводим их
+                console.log("Запланированная дата:", date.toLocaleDateString()); // Выведение даты в удобном читабельном формате
             });
-
-            console.log();
+            
+            console.log(); // Пустая строка для разделения вывода
         }
     }
-    console.log(acts);
+    console.log(acts); // После обработки всех сенсоров и актов выводим объект acts (если есть что выводить)
 }
 
-calcPlannedActs();
+calcPlannedActs(); // Запускаем функцию
