@@ -3,9 +3,8 @@ let year = 2020;
 
 // Функция для проверки высокостного года
 function isLeapYear(year) {
-    if (year % 4 === 0) {      
-     else {
-            return true; // Год делится на 4, он высокостный
+    if (year % 4 === 0) {
+        return true; // Год делится на 4, он высокостный
     } else {
         return false; // Год не делится на 4, он не высокостный
     }
