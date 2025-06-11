@@ -74,8 +74,8 @@ function calcPlannedActs(){
             let plannedActs = []; // Массив для хранения запланированных актов
             for (let i = 0; i < 4; i++) { // создал цикл for добавил в массив даты
                 let newDate = new Date(dateStart);
-                newDate.setDate(dateStart.getDate() + i * 2); // прибавляю 2 дня на каждом шаге
-                plannedActs.push(newDate); // соединяю массив с
+                newDate.setDate(dateStart.getDate() + i * 1); // прибавляю 1 месяц на каждом шаге
+                plannedActs.push(newDate); // использует метод push() для добавления элемента newDate в массив plannedActs
             }
 
             // Вывод дат
