@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шахматная доска</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin: 20px;
+        }
+        td {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 24px;
+        }
+        .black {
+            background-color: black;
+            color: white;
+        }
+        .white {
+            background-color: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+<div id="chess-board"></div>
+
+<script>
+    function generateChessBoard() {
+        const board = document.createElement('table');
+        const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+        // Создаем строки и ячейки
+        for (let row = 0; row < 8; row++) {
+            const tr = document.createElement('tr');
+
+            // Добавляем номер строки
+            const rowNumber = document.createElement('td');
+            rowNumber.textContent = 8 - row; // Нумерация от 8 до 1
+            tr.appendChild(rowNumber);
+
+            for (let col = 0; col < 8; col++) {
+                const td = document.createElement('td');
+                
+                // Определяем цвет ячейки
+                if ((row + col) % 2 === 0) {
+                    td.className = 'white';
+                } else {
+                    td.className = 'black';
+                }
+
+                tr.appendChild(td);
+            }
+
+            board.appendChild(tr);
+        }
+
+        // Добавляем заголовок с буквами столбцов
+        const headerRow = document.createElement('tr');
+        headerRow.appendChild(document.createElement('td')); // Пустая ячейка в левом верхнем углу
+        letters.forEach(letter => {
+            const headerCell = document.createElement('td');
+            headerCell.textContent = letter; // Задаем буквы столбцов
+            headerRow.appendChild(headerCell);
+        });
+        
+        board.prepend(headerRow); // Добавляем заголовок перед основной таблицей
+        document.getElementById('chess-board').appendChild(board);
+    }
+
+    // Генерируем шахматную доску при загрузке страницы
+    window.onload = generateChessBoard;
+</script>
+
+</body>
+</html>
