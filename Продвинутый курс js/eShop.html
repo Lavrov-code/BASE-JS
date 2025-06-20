@@ -14,7 +14,14 @@
       position: sticky;
       top: 0;
       z-index: 20;
+    } 
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
+
     .container {
       max-width: 1700px;
       margin: 0 auto;
@@ -25,12 +32,6 @@
       background-color: #d5d4d4;
       color: #333;
       line-height: 1.6;
-    }
-    
-    .header-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
     
     .logo {
@@ -342,7 +343,7 @@
       padding: 15px 25px;
       background: #45c495;
       color: white;
-      border-radius: 5px;
+      border-radius: 20px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
       transform: translateX(220%);
       transition: transform 0.25s ease;
@@ -358,10 +359,6 @@
       .goods-list {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       }
-      
-      .cart-modal {
-        width: 320px;
-      }
     }
     
     @media (max-width: 580px) {
@@ -369,18 +366,15 @@
         flex-direction: column;
         gap: 15px;
       }
-      
-      .cart-modal {
-        width: 100%;
-      }
     }
-      .error {
+    .error {
         border: 2px solid red;
-        }
-      .feed{
+    }
+
+    .feed{
         font-size: 16px;
-        margin-left: 110px;
-        }
+        margin: 10px;
+    }
   </style>
 </head>
 <body>
@@ -426,7 +420,6 @@
       <div class="goods-list"></div>
     </main>
   </div>
-  
   <!-- Модальное окно корзины -->
   <div class="cart-modal">
     <div class="cart-header">
