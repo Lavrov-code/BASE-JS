@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Задание 6</title>
+    <style>
+        /* Основные стили */
+        .body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .product {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 35px;
+            margin: 70px;
+            width: 280px;
+            display: inline-block;
+            vertical-align: top;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .basket {
+            border: 1px solid #000;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .catalog {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        /* Окно для изображения */
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .button {
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+        .modal-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .modal-image {
+            max-width: 75%;
+            max-height: 75%;
+            object-fit: contain;
+        }
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .nav-arrows {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin-top: 20px;
+        }
+        .arrow {
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            padding: 10px 20px;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 50%;
+        }
+        .thumbnail-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .thumbnail {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            margin: 5px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 3px;
+        }
+        .thumbnail.active {
+            border-color: #4CAF50;
+        }
+        
+        /* Новые стили для корзины */
+        .basket-section {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #f9f9f9;
+        }
+
+        .basket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px;
+            background-color: #eee;
+            border-radius: 3px;
+        }
+
+        .basket-content {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .basket-content.active {
+            display: block;
+        }
+
+        .basket-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .basket-item-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .basket-item-quantity {
+            margin: 0 10px;
+        }
+
+        .basket-total {
+            font-weight: bold;
+            text-align: right;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .empty-basket {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .arrow-down {
+            width: 15px;
+            height: 15px;
+            background-image: url("img/arrow.png");
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Каталог товаров:</h1>
+    <div id="catalog" class="catalog"></div>
+    
+    <h2>Корзина:</h2>
+    <div id="basket" class="basket"></div>
+
+        <div id="new-basket">
+        <!-- Секция состава корзины -->
+        <div class="basket-section">
+            <div class="basket-header" onclick="toggleBasketSection('basket-items')">
+                <h3>Состав корзины</h3>
+                <div class="arrow-down"></div>
+            </div>
+            <div id="basket-items-content" class="basket-content active">
+                <div id="basket-items-list"></div>
+                <div id="basket-items-total" class="basket-total"></div>
+                <div class="navigation-buttons">
+                    <button onclick="toggleBasketSection('basket-items', 'delivery-address')">Далее</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Секция адреса доставки -->
+        <div class="basket-section">
+            <div class="basket-header" onclick="toggleBasketSection('delivery-address')">
+                <h3>Адрес доставки</h3>
+                <div class="arrow-down"></div>
+            </div>
+            <div id="delivery-address-content" class="basket-content">
+                <div class="form-group">
+                    <label for="address-street">Улица</label>
+                    <input type="text" id="address-street" placeholder="Введите улицу">
+                </div>
+                <div class="form-group">
+                    <label for="address-house">Дом</label>
+                    <input type="text" id="address-house" placeholder="Введите номер дома">
+                </div>
+                <div class="form-group">
+                    <label for="address-apartment">Квартира</label>
+                    <input type="text" id="address-apartment" placeholder="Введите номер квартиры">
+                </div>
+                <div class="navigation-buttons">
+                    <button onclick="toggleBasketSection('delivery-address', 'basket-items')">Назад</button>
+                    <button onclick="toggleBasketSection('delivery-address', 'delivery-comment')">Далее</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Секция комментария -->
+        <div class="basket-section">
+            <div class="basket-header" onclick="toggleBasketSection('delivery-comment')">
+                <h3>Комментарий</h3>
+                <div class="arrow-down"></div>
+            </div>
+            <div id="delivery-comment-content" class="basket-content">
+                <div class="form-group">
+                    <label for="order-comment">Комментарий к заказу</label>
+                    <textarea id="order-comment" placeholder="Введите ваш комментарий"></textarea>
+                </div>
+                <div class="navigation-buttons">
+                    <button onclick="toggleBasketSection('delivery-comment', 'delivery-address')">Назад</button>
+                    <button onclick="submitOrder()">Оформить заказ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для изображений -->
+    <div id="imageModal" class="modal">
+        <span class="close">x</span>
+        <div class="modal-content">
+            <img id="modalImage" class="modal-image" src="" alt="">
+            <div class="nav-arrows">
+                <div class="arrow" id="prevImage">&lt;</div>
+                <div class="arrow" id="nextImage">&gt;</div>
+            </div>
+            <div class="thumbnail-container" id="thumbnails"></div>
+        </div>
+    </div>
+
+    <script>
+        // Структура базы данных
+        const database = {
+            // Таблица товаров
+            products: [
+                { 
+                    id: 1, 
+                    name: "Телефон", 
+                    description: "Непробиваемый Ulefone Armor 27", 
+                    price: 45990, 
+                    category_id: 1,
+                    photos: [
+                        { id: 1, url: "mobile.jpg", alt: "Телефон вид спереди" },
+                        { id: 2, url: "mobile1.jpg", alt: "Телефон вид сбоку" },
+                        { id: 3, url: "mobile2.jpg", alt: "Телефон детали" }
+                    ] 
+                },
+                { 
+                    id: 2, 
+                    name: "Ноутбук", 
+                    description: "Игровой ноутбук GPD", 
+                    price: 69999, 
+                    category_id: 1,
+                    photos: [
+                        { id: 4, url: "notebook.jpg", alt: "Ноутбук вид спереди" },
+                        { id: 5, url: "notebook1.jpg", alt: "Ноутбук вид сбоку" },
+                        { id: 6, url: "notebook2.jpg", alt: "Ноутбук детали" }
+                    ] 
+                },  { 
+                    id: 3, 
+                    name: "Рюкзак", 
+                    description: "Городской рюкзак с USB-портом", 
+                    price: 2999, 
+                    category_id: 2,
+                    photos: [
+                        { id: 7, url: "bag1.jpg", alt: "Рюкзак вид спереди" },
+                        { id: 8, url: "bag.jpg", alt: "Рюкзак вид сбоку" },
+                        { id: 9, url: "bag2.jpg", alt: "Ноутбук детали" }
+                    ] 
+                },
+                { 
+                    id: 4, 
+                    name: "Беспроводная мышка", 
+                    description: "Киберспортивная мышка", 
+                    price: 2499, 
+                    category_id: 3,
+                    photos: [
+                        { id: 10, url: "mouse.jpg", alt: "Беспроводная мышка вид сверху" },
+                        { id: 11, url: "mouse1.jpg", alt: "Беспроводная мышка вид сбоку" },
+                        { id: 12, url: "mouse2.jpg", alt: "Беспроводная мышка детали" }
+                    ] 
+                },
+                { 
+                    id: 5, 
+                    name: "Беспроводная зарядка", 
+                    description: "Беспроводное устройство", 
+                    price: 4999, 
+                    category_id: 3,
+                    photos: [
+                        { id: 13, url: "charger.jpg", alt: "Зарядка вид сбоку" },
+                        { id: 14, url: "charger1.jpg", alt: "Зарядка вид сверху" },
+                        { id: 15, url: "charger2.jpg", alt: "Зарядка детали" }
+                    ] 
+                },
+            
+            ],
+            
+            // Таблица категорий
+            categories: [
+                { id: 1, name: "Устройства" },
+                { id: 2, name: "Сумки и рюкзаки" },
+                { id: 3, name: "Беспроводные устройства" }
+            ]
+        };
+
+        // Корзина
+        let basket = [];
+        
+        // Переменные для управления модальным окном
+        let currentProductId = null;
+        let currentImageIndex = 0;
+
+        // Функция подсчета стоимости корзины
+        function countBasketPrice(basketItems) {
+            return basketItems.reduce((total, item) => total + item.price * item.quantity, 0);
+        }
+
+        // Функция отображения корзины
+        function renderBasket() {
+            const basketElement = document.getElementById('basket');
+            
+            if (basket.length === 0) {
+                basketElement.textContent = "Корзина пуста";
+            } else {
+                const totalPrice = countBasketPrice(basket);
+                const totalItems = basket.reduce((total, item) => total + item.quantity, 0);
+                
+                basketElement.innerHTML = `
+                    <p>В корзине: ${totalItems} товаров на сумму ${totalPrice} рублей</p>
+                    <ul>
+                        ${basket.map(item => `
+                            <li>${item.name} - ${item.quantity} шт. x ${item.price} руб. = ${item.quantity * item.price} руб.</li>
+                        `).join('')}
+                    </ul>
+                    <button onclick="clearBasket()">Очистить корзину</button>
+                `;
+            }
+        }
+
+        // Функция очистки корзины
+        function clearBasket() {
+            basket = [];
+            renderBasket();
+        }
+
+        // Функция отображения каталога
+        function renderCatalog() {
+            const catalogElement = document.getElementById('catalog');
+            
+            catalogElement.innerHTML = database.products.map(product => {
+                const category = database.categories.find(c => c.id === product.category_id);
+                const hasImages = product.photos && product.photos.length > 0;
+                
+                return `
+                    <div class="product" data-id="${product.id}">
+                        <h3>${product.name}</h3>
+                        ${category ? `<p>Категория: ${category.name}</p>` : ''}
+                        <p>${product.description}</p>
+                        <p>Цена: ${product.price} руб.</p>
+                        ${hasImages ? 
+                            `<img src="${product.photos[0].url}" alt="${product.photos[0].alt}" class="product-image" 
+                                 onclick="openImageModal(${product.id}, 0)">` : 
+                            '<p>Нет изображения</p>'}
+                        ${hasImages && product.photos.length > 1 ? `
+                            <div class="thumbnail-container">
+                                ${product.photos.map((photo, index) => `
+                                    <img src="${photo.url}" alt="${photo.alt}" class="thumbnail" 
+                                         onclick="openImageModal(${product.id}, ${index})">
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                        <button onclick="addToBasket(${product.id})">Купить</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Функция добавления товара в корзину
+        function addToBasket(productId) {
+            const product = database.products.find(p => p.id === productId);
+            if (!product) return;
+            
+            const existingItem = basket.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                basket.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: 1
+                });
+            }
+            // Отображаем корзину
+            renderBasket();
+        }
+// Функция отображения товаров в корзине
+        function renderBasketItems() {
+            const basketItemsList = document.getElementById('basket-items-list');
+            const basketTotal = document.getElementById('basket-items-total');
+
+            if (basket.length === 0) {
+                basketItemsList.innerHTML = '<div class="empty-basket">Корзина пуста</div>';
+                basketTotal.textContent = '';
+            } else {
+                basketItemsList.innerHTML = basket.map(item => `
+                    <div class="basket-item">
+                        <div>${item.name} - ${item.price} руб.</div>
+                        <div class="basket-item-controls">
+                            <button onclick="changeQuantity(${item.id}, -1)">-</button>
+                            <span class="basket-item-quantity">${item.quantity}</span>
+                            <button onclick="changeQuantity(${item.id}, 1)">+</button>
+                            <button onclick="removeFromBasket(${item.id})">Удалить</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                const totalPrice = countBasketPrice(basket);
+                basketTotal.textContent = `Итого: ${totalPrice} руб.`;
+            }
+        }
+
+        // Функция изменения количества товара
+        function changeQuantity(productId, delta) {
+            const item = basket.find(item => item.id === productId);
+            if (!item) return;
+
+            item.quantity += delta;
+
+            if (item.quantity <= 0) {
+                basket = basket.filter(item => item.id !== productId);
+            }
+
+            renderBasketItems();
+        }
+
+        // Функция удаления товара из корзины
+        function removeFromBasket(productId) {
+            basket = basket.filter(item => item.id !== productId);
+            renderBasketItems();
+        }
+
+        // Функция переключения секций корзины
+        function toggleBasketSection(currentSection, nextSection = null) {
+            // Закрываем текущую секцию, если не указана следующая (просто клик по заголовку)
+            if (!nextSection) {
+                const content = document.getElementById(`${currentSection}-content`);
+                content.classList.toggle('active');
+                return;
+            }
+            // Закрываем текущую секцию и открываем следующую
+            document.getElementById(`${currentSection}-content`).classList.remove('active');
+            document.getElementById(`${nextSection}-content`).classList.add('active');
+        }
+
+        // Функция оформления заказа
+        function submitOrder() {
+            if (basket.length === 0) {
+                alert('Корзина пуста!');
+                toggleBasketSection('delivery-comment', 'basket-items');
+                return;
+            }
+
+            const street = document.getElementById('address-street').value;
+            const house = document.getElementById('address-house').value;
+            const comment = document.getElementById('order-comment').value;
+
+            if (!street || !house) {
+                alert('Пожалуйста, заполните обязательные поля адреса доставки!');
+                toggleBasketSection('delivery-comment', 'delivery-address');
+                return;
+            }
+            alert('Заказ успешно оформлен!');
+
+            // Очищаем корзину и форму
+            basket = [];
+            document.getElementById('address-street').value = '';
+            document.getElementById('address-house').value = '';
+            document.getElementById('address-apartment').value = '';
+            document.getElementById('order-comment').value = '';
+
+            // Возвращаемся к первому шагу
+            toggleBasketSection('delivery-comment', 'basket-items');
+            renderBasketItems();
+        }
+        
+        // Функции для работы с модальным окном изображений
+        function openImageModal(productId, imageIndex) {
+            const product = database.products.find(p => p.id === productId);
+            if (!product || !product.photos || product.photos.length === 0) return;
+            
+            currentProductId = productId;
+            currentImageIndex = imageIndex;
+            
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const thumbnailsContainer = document.getElementById('thumbnails');
+            
+            modal.style.display = "block";
+            modalImg.src = product.photos[imageIndex].url;
+            modalImg.alt = product.photos[imageIndex].alt;
+            
+            // Обновляем миниатюры
+            thumbnailsContainer.innerHTML = product.photos.map((photo, idx) => `
+                <img src="${photo.url}" alt="${photo.alt}" class="thumbnail ${idx === imageIndex ? 'active' : ''}" 
+                     onclick="changeImage(${idx})">
+            `).join('');
+        }
+
+        function changeImage(index) {
+            const product = database.products.find(p => p.id === currentProductId);
+            if (!product || index < 0 || index >= product.photos.length) return;
+            
+            currentImageIndex = index;
+            document.getElementById('modalImage').src = product.photos[index].url;
+            document.getElementById('modalImage').alt = product.photos[index].alt;
+            
+        }
+
+        // Функция пролистывание на следующую фотографию
+        function nextImage() {
+            const product = database.products.find(p => p.id === currentProductId);
+            if (!product) return;
+            
+            const nextIndex = (currentImageIndex + 1) % product.photos.length;
+            changeImage(nextIndex);
+        }
+
+        // Функция пролистывание на прошлую фотографию
+        function prevImage() {
+            const product = database.products.find(p => p.id === currentProductId);
+            if (!product) return;
+            
+            const prevIndex = (currentImageIndex - 1 + product.photos.length) % product.photos.length;
+            changeImage(prevIndex);
+        }
+        
+        //  Функция закрытие модального окна
+        function closeModal() {
+            document.getElementById('imageModal').style.display = "none";
+        }
+
+        // Инициализация при загрузке страницы
+        window.onload = function() {
+            renderCatalog();
+            renderBasket();
+            
+            // Назначаем обработчики событий для модального окна
+            document.querySelector('.close').addEventListener('click', closeModal);
+            document.getElementById('prevImage').addEventListener('click', prevImage);
+            document.getElementById('nextImage').addEventListener('click', nextImage);
+        };
+        
+    </script>
+</body>
+</html>
